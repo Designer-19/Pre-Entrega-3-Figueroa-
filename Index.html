@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Boliche</title>
+    <style>
+        /* Estilos opcionales */
+        #vip-section {
+            display: none;
+        }
+        h4 {
+            text-decoration: underline;
+            color: lightcoral;
+            font-weight: bold;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-style: oblique;
+        }
+        h1 {
+            color: brown;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+        #calcular {
+            text-decoration: underline;
+            color: blue;
+            background-color: lightsalmon;
+        }
+        p {
+            color: orangered;
+            text-decoration: underline;
+            font-weight: bolder;
+        }
+        label {
+            color: red;
+        }
+        h2 {
+            color: darkblue;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+        h3 {
+            font-weight: bold;
+            color: darkmagenta;
+            text-decoration: underline;
+            font-family: verdana, normal;
+        }
+        h5 {
+            font-weight: bold;
+            color: rgb(30, 139, 0);
+            text-decoration: underline;
+            font-family: verdana, normal; 
+        }
+    </style>
+</head>
+<body>
+    <h1>Simulador Boliche</h1>
+
+    <h2>Bienvenidos</h2>
+
+    <h3>Precio Entrada</h3>
+    <p>Precio = $9.000</p>
+
+    <h3>Mesas VIP</h3>
+    <p>Capacidad por Mesa = 12 personas</p>
+    <p>Precio = $156.000</p>
+
+    <h4>Selecciona la cantidad de entradas:</h4>
+    <label for="cantidad-entradas">Cantidad de Entradas:</label>
+    <input type="number" id="cantidad-entradas" min="1" required>
+
+    <h4>¿Deseas comprar una mesa VIP?</h4>
+    <label for="mesa-vip">Selecciona una opción:</label>
+    <select id="mesa-vip">
+        <option value="no">No</option>
+        <option value="si">Sí</option>
+    </select>
+
+    <!-- Menú para la cantidad de personas en la mesa VIP, oculto por defecto -->
+    <div id="vip-section" style="display: none;">
+        <h4>Selecciona la cantidad de personas para la mesa VIP (máximo 12):</h4>
+        <label for="cantidad-personas-vip">Cantidad de Personas:</label>
+        <input type="number" id="cantidad-personas-vip" min="1" max="12">
+    </div>
+
+    <h4>Selecciona una bebida:</h4>
+    <label for="bebida">Bebida:</label>
+    <select id="bebida">
+        <option value="Cerveza">Cerveza</option>
+        <option value="Agua">Agua</option>
+        <option value="Caipirinha Frutos Rojos">Caipirinha Frutos Rojos</option>
+        <option value="Fernet con Coca">Fernet con Coca</option>
+        <option value="Vodka con Speed">Vodka con Speed</option>
+        <option value="Botella de Fernet">Botella de Fernet</option>
+        <option value="Caipirinha Maracuya">Caipirinha Maracuya</option>
+        <option value="Caipirinha Absolut">Caipirinha Absolut</option>
+        <option value="Caipirinha Smirnoff">Caipirinha Smirnoff</option>
+        <option value="Caipiroska Absolut con Maracuya">Caipiroska Absolut con Maracuya</option>
+        <option value="Caipiroska Absolut con Frutos Rojos">Caipiroska Absolut con Frutos Rojos</option>
+        <option value="Caipiroska Absolut">Caipiroska Absolut</option>
+        <option value="Caipiroska Smirnoff">Caipiroska Smirnoff</option>
+    </select>
+
+    <h4>Selecciona la cantidad de bebidas:</h4>
+    <label for="cantidad-bebidas">Cantidad de Bebidas:</label>
+    <input type="number" id="cantidad-bebidas" min="1" required>
+
+    <button id="calcular">Calcular Total</button>
+
+    <!-- Tabla para mostrar los datos ingresados -->
+    <h4>Datos Ingresados:</h4>
+    <table id="tabla-datos" border="1" style="border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th>Concepto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Los datos se llenarán aquí mediante JavaScript -->
+        </tbody>
+    </table>
+
+    <!-- Resultados -->
+    <h5 id="resultado-entradas"></h5>
+    <h5 id="resultado-bebidas"></h5>
+    <h5 id="resultado-mesa-vip"></h5>
+    <h5 id="resultado-total"></h5>
+
+    <!-- Script JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
