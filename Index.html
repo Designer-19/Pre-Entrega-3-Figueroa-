@@ -71,16 +71,29 @@
 
     <h4>¿Deseas comprar una mesa VIP?</h4>
     <label for="mesa-vip">Selecciona una opción:</label>
-    <select id="mesa-vip">
+    <select id="mesa-vip" onchange="manejarSeleccionVIP()">
         <option value="no">No</option>
         <option value="si">Sí</option>
     </select>
 
     <!-- Menú para la cantidad de personas en la mesa VIP, oculto por defecto -->
-    <div id="vip-section" style="display: none;">
+    <div id="vip-section">
         <h4>Selecciona la cantidad de personas para la mesa VIP (máximo 12):</h4>
         <label for="cantidad-personas-vip">Cantidad de Personas:</label>
         <input type="number" id="cantidad-personas-vip" min="1" max="12">
+    </div>
+
+    <!-- Nueva sección para seleccionar la cantidad de mesas VIP -->
+    <div id="mesa-vip-section" style="display: none;">
+        <label for="cantidad-mesas-vip">¿Cuántas mesas VIP deseas reservar?</label>
+        <select id="cantidad-mesas-vip">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
     </div>
 
     <h4>Selecciona una bebida:</h4>
@@ -105,7 +118,28 @@
     <label for="cantidad-bebidas">Cantidad de Bebidas:</label>
     <input type="number" id="cantidad-bebidas" min="1" required>
 
-    <button id="calcular">Calcular Total</button>
+    <!-- Tabla para Nombre y Apellido -->
+    <h4>Información del Cliente:</h4>
+    <table id="tabla-cliente" border="1" style="border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th>Campo</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Nombre</td>
+                <td><input type="text" id="nombre" required></td>
+            </tr>
+            <tr>
+                <td>Apellido</td>
+                <td><input type="text" id="apellido" required></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button id="calcular" onclick="calcularTotal()">Calcular Total</button>
 
     <!-- Tabla para mostrar los datos ingresados -->
     <h4>Datos Ingresados:</h4>
@@ -116,6 +150,20 @@
                 <th>Cantidad</th>
                 <th>Precio Unitario</th>
                 <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Los datos se llenarán aquí mediante JavaScript -->
+        </tbody>
+    </table>
+
+    <!-- Nueva Tabla para Nombre y Apellido -->
+    <h4>Nombre y Apellido:</h4>
+    <table id="tabla-nombre-apellido" border="1" style="border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th>Campo</th>
+                <th>Valor</th>
             </tr>
         </thead>
         <tbody>
