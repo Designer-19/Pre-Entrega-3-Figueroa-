@@ -85,38 +85,21 @@ function totalEntrada(cantidadEntradas) {
     return cantidadEntradas * precioEntrada;
 }
 
-// Función para manejar la selección de mesa VIP
-function manejarSeleccionVIP() {
-    const mesaVipSelect = document.getElementById('mesa-vip');
-    const vipSection = document.getElementById('vip-section');
-
-    if (mesaVipSelect && vipSection) {
-        const seleccionVIP = mesaVipSelect.value;
-        vipSection.style.display = seleccionVIP === 'si' ? 'block' : 'none';
-    } else {
-        console.error("Elementos del DOM para mesa VIP no encontrados.");
-    }
-}
-
-// Nueva función para calcular el costo de las mesas VIP
+// Función para calcular el costo de las mesas VIP
 function calcularMesasVIP() {
     const cantidadMesasVIPInput = document.getElementById('cantidad-mesas-vip');
-    const mesaVipSelect = document.getElementById('mesa-vip');
     let totalMesasVIP = 0;
 
-    if (mesaVipSelect && cantidadMesasVIPInput) {
-        const seleccionVIP = mesaVipSelect.value;
-        if (seleccionVIP === 'si') {
-            const cantidadMesasVIP = parseInt(cantidadMesasVIPInput.value) || 0;
+    if (cantidadMesasVIPInput) {
+        const cantidadMesasVIP = parseInt(cantidadMesasVIPInput.value) || 0;
 
-            if (cantidadMesasVIP > 0) {
-                totalMesasVIP = cantidadMesasVIP * 156000; // Precio por mesa VIP
-            } else {
-                alert("Por favor selecciona una cantidad válida de mesas VIP.");
-            }
+        if (cantidadMesasVIP > 0) {
+            totalMesasVIP = cantidadMesasVIP * 156000; // Precio por mesa VIP
+        } else {
+            alert("Por favor selecciona una cantidad válida de mesas VIP.");
         }
     } else {
-        console.error("Elementos del DOM para mesa VIP no encontrados.");
+        console.error("Elemento del DOM para mesa VIP no encontrado.");
     }
 
     return totalMesasVIP;
@@ -221,4 +204,32 @@ function cargarDatos() {
 }
 
 // Llamar a cargarDatos al cargar la página
-window.onload = cargarDatos;
+window.onload = function() {
+    cargarDatos(); // Cargar datos desde localStorage
+    manejarSeleccionVIP(); // Inicializa el manejo de la selección VIP
+}
+
+// Función adicional para manejar la selección VIP
+function manejarSeleccionVIP() {
+    const vipSelect = document.getElementById('mesa-vip'); // Select del HTML
+    const cantidadMesasVIPInput = document.getElementById('mesa-vip-section'); // Contenedor para la cantidad de mesas VIP
+
+    if (vipSelect && cantidadMesasVIPInput) {
+        vipSelect.addEventListener('change', function() {
+            if (vipSelect.value === "si") {
+                cantidadMesasVIPInput.style.display = 'block';  // Muestra la sección de cantidad de mesas VIP
+            } else {
+                cantidadMesasVIPInput.style.display = 'none';   // Oculta la sección de cantidad de mesas VIP si seleccionan "No"
+                document.getElementById('cantidad-mesas-vip').value = '0';  // Restablece el valor a 0 cuando se oculta
+            }
+        });
+    } else {
+        console.error("Elemento del DOM para select mesa VIP o input mesas VIP no encontrado.");
+    }
+}
+
+// Asegúrate de que la función se ejecute una vez que la página esté completamente cargada
+window.onload = function() {
+    cargarDatos(); // Cargar datos desde localStorage
+    manejarSeleccionVIP(); // Inicializa el manejo de la selección VIP
+};
