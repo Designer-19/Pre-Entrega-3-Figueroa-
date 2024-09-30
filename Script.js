@@ -46,7 +46,7 @@ function calcularTotalBebidas(bebidasSeleccionadas) {
             return total + (bebida.precio * bebidaSeleccionada.cantidad);
         } else {
             console.warn(`Bebida no encontrada: ${bebidaSeleccionada.nombre}`);
-            return total; // O manejarlo de otra forma
+            return total;
         }
     }, 0);
 }
@@ -105,7 +105,22 @@ function calcularMesasVIP() {
     return totalMesasVIP;
 }
 
-// Nueva función para calcular el total
+// Función para manejar la selección de mesas VIP
+function manejarSeleccionVIP() {
+    const seleccion = document.getElementById("mesa-vip").value;
+    const vipSection = document.getElementById("vip-section");
+    const mesaVipSection = document.getElementById("mesa-vip-section");
+
+    if (seleccion === "si") {
+        vipSection.style.display = "block"; // Muestra la sección de VIP
+        mesaVipSection.style.display = "block"; // Muestra la selección de mesas VIP
+    } else {
+        vipSection.style.display = "none"; // Oculta la sección de VIP
+        mesaVipSection.style.display = "none"; // Oculta la selección de mesas VIP
+    }
+}
+
+// Función principal para calcular y mostrar el total
 function calcularTotal() {
     const cantidadEntradasInput = document.getElementById('cantidad-entradas');
     const cantidadEntradas = parseInt(cantidadEntradasInput.value) || 0;
@@ -185,51 +200,31 @@ function calcularTotal() {
         entradas: cantidadEntradas,
         bebidas: bebidasSeleccionadas,
         mesasVIP: cantidadMesasVIP,
+        total: totalFinalHTML,
         nombre: nombreInput,
-        apellido: apellidoInput,
-        total: totalFinalHTML
+        apellido: apellidoInput
     }));
 }
 
-// Función para cargar datos desde localStorage
-function cargarDatos() {
-    const datos = JSON.parse(localStorage.getItem('datosBoliche'));
-    if (datos) {
-        document.getElementById('cantidad-entradas').value = datos.entradas || 0;
-        document.getElementById('nombre').value = datos.nombre || '';
-        document.getElementById('apellido').value = datos.apellido || '';
+// Función para recuperar datos del localStorage
+function recuperarDatos() {
+    const datosGuardados = JSON.parse(localStorage.getItem('datosBoliche'));
+    if (datosGuardados) {
+        document.getElementById('cantidad-entradas').value = datosGuardados.entradas;
+        document.getElementById('nombre').value = datosGuardados.nombre;
+        document.getElementById('apellido').value = datosGuardados.apellido;
 
-        // Aquí puedes agregar la lógica para cargar bebidas y mesas VIP
-    }
-}
-
-// Llamar a cargarDatos al cargar la página
-window.onload = function() {
-    cargarDatos(); // Cargar datos desde localStorage
-    manejarSeleccionVIP(); // Inicializa el manejo de la selección VIP
-}
-
-// Función adicional para manejar la selección VIP
-function manejarSeleccionVIP() {
-    const vipSelect = document.getElementById('mesa-vip'); // Select del HTML
-    const cantidadMesasVIPInput = document.getElementById('mesa-vip-section'); // Contenedor para la cantidad de mesas VIP
-
-    if (vipSelect && cantidadMesasVIPInput) {
-        vipSelect.addEventListener('change', function() {
-            if (vipSelect.value === "si") {
-                cantidadMesasVIPInput.style.display = 'block';  // Muestra la sección de cantidad de mesas VIP
-            } else {
-                cantidadMesasVIPInput.style.display = 'none';   // Oculta la sección de cantidad de mesas VIP si seleccionan "No"
-                document.getElementById('cantidad-mesas-vip').value = '0';  // Restablece el valor a 0 cuando se oculta
+        // Cargar bebidas
+        for (const bebida of datosGuardados.bebidas) {
+            const bebidaInput = document.getElementById('bebida-' + bebida.nombre.toLowerCase());
+            if (bebidaInput) {
+                bebidaInput.value = bebida.cantidad;
             }
-        });
-    } else {
-        console.error("Elemento del DOM para select mesa VIP o input mesas VIP no encontrado.");
+        }
+
+        document.getElementById('cantidad-mesas-vip').value = datosGuardados.mesasVIP;
     }
 }
 
-// Asegúrate de que la función se ejecute una vez que la página esté completamente cargada
-window.onload = function() {
-    cargarDatos(); // Cargar datos desde localStorage
-    manejarSeleccionVIP(); // Inicializa el manejo de la selección VIP
-};
+// Llamar a la función para recuperar datos cuando se carga la página
+window.onload = recuperarDatos;
