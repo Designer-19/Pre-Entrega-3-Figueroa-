@@ -16,25 +16,21 @@ const bebidas = [
     new Bebida("Cerveza", 7000),
     new Bebida("Agua", 3500),
     new Bebida("Caipi Frutos Rojos", 10000),
-    new Bebida("Caipi Maracuya", 10000),
+    new Bebida("Caipi Maracuyá", 10000),
     new Bebida("Caipi Absolut", 10000),
     new Bebida("Caipi Smirnoff", 10000),
     new Bebida("Fernet con Coca", 8500),
     new Bebida("Vodka con Speed", 6790),
     new Bebida("Botella de Fernet", 90000),
-    new Bebida("Caipiroska Absolut con Maracuya", 14000),
+    new Bebida("Caipiroska Absolut con Maracuyá", 14000),
     new Bebida("Caipiroska Absolut con Frutos Rojos", 14000),
     new Bebida("Caipiroska Absolut", 14000),
     new Bebida("Caipiroska Smirnoff", 14000)
 ];
 
-// Función para validar el número de la bebida seleccionada
-function validarSeleccion(seleccion, max) {
-    return !isNaN(seleccion) && seleccion > 0 && seleccion <= max;
-}
-
 // Función para encontrar una bebida específica usando find()
 function encontrarBebida(nombre) {
+    // Busca el nombre directamente sin modificarlo
     return bebidas.find(bebida => bebida.nombre.toLowerCase() === nombre.toLowerCase());
 }
 
@@ -54,12 +50,12 @@ function calcularTotalBebidas(bebidasSeleccionadas) {
 // Función para seleccionar bebidas
 function seleccionarBebidas() {
     const bebidaSeleccionada = document.getElementById('bebida').value;
-    const cantidadBebidas = document.getElementById('cantidad-bebidas').value;
+    const cantidadBebidas = parseInt(document.getElementById('cantidad-bebidas').value) || 0;
 
     if (bebidaSeleccionada && cantidadBebidas > 0) {
         const bebidaInfo = document.getElementById('resultado-bebidas');
         bebidaInfo.textContent = `Has seleccionado ${cantidadBebidas} ${bebidaSeleccionada}`;
-        return [{ nombre: bebidaSeleccionada, cantidad: parseInt(cantidadBebidas) }];
+        return [{ nombre: bebidaSeleccionada, cantidad: cantidadBebidas }];
     } else {
         document.getElementById('mensaje-error').textContent = "Por favor, selecciona una bebida y la cantidad.";
         return [];
@@ -79,8 +75,10 @@ function calcularMesasVIP() {
     if (cantidadMesasVIPInput) {
         const cantidadMesasVIP = parseInt(cantidadMesasVIPInput.value) || 0;
 
+        // Validar que la cantidad de mesas VIP sea un número positivo
         if (cantidadMesasVIP > 0) {
             totalMesasVIP = cantidadMesasVIP * 156000; // Precio por mesa VIP
+            document.getElementById('mensaje-error-vip').textContent = ""; // Limpiar mensaje de error
         } else {
             document.getElementById('mensaje-error-vip').textContent = "Por favor selecciona una cantidad válida de mesas VIP.";
         }
@@ -91,25 +89,13 @@ function calcularMesasVIP() {
     return totalMesasVIP;
 }
 
-function manejarSeleccionVIP() {
-    const mesaVIP = document.getElementById("mesa-vip").value;
-    const vipSection = document.getElementById("vip-section");
-
-    if (mesaVIP === "si") {
-        vipSection.style.display = "block"; // Mostrar sección VIP
-    } else {
-        vipSection.style.display = "none"; // Ocultar sección VIP
-    }
-}
-
-
 
 // Función principal para calcular y mostrar el total
 function calcularTotal() {
     const cantidadEntradasInput = document.getElementById('cantidad-entradas');
     const cantidadEntradas = parseInt(cantidadEntradasInput.value) || 0;
-    const totalEntradasHTML = totalEntrada(cantidadEntradas);
 
+    const totalEntradasHTML = totalEntrada(cantidadEntradas);
     const bebidasSeleccionadas = seleccionarBebidas();
     const totalBebidasHTML = calcularTotalBebidas(bebidasSeleccionadas);
     const totalMesasVIPHTML = calcularMesasVIP();
@@ -119,38 +105,56 @@ function calcularTotal() {
     const resultadoBebidas = document.getElementById('resultado-bebidas');
     const resultadoMesaVIP = document.getElementById('resultado-mesa-vip');
     const resultadoTotal = document.getElementById('resultado-total');
+
+    // Llenar tabla con los resultados
+    llenarTablas(bebidasSeleccionadas, cantidadEntradas, totalEntradasHTML, totalMesasVIPHTML);
+
+    resultadoEntradas.textContent = `Total Entradas: $${totalEntradasHTML}`;
+    resultadoBebidas.textContent = `Total Bebidas: $${totalBebidasHTML}`;
+    resultadoMesaVIP.textContent = `Total Mesas VIP: $${totalMesasVIPHTML}`;
+    resultadoTotal.textContent = `Total Final: $${totalFinalHTML}`;
+
+    // Agregar lógica para llenar la tabla con nombre y apellido
+    llenarTablaNombreApellido();
+
+    // Guardar en localStorage
+    localStorage.setItem('datosBoliche', JSON.stringify({
+        entradas: cantidadEntradas,
+        bebidas: bebidasSeleccionadas,
+        mesasVIP: document.getElementById('cantidad-mesas-vip').value,
+        total: totalFinalHTML,
+        nombre: document.getElementById('nombre').value,
+        apellido: document.getElementById('apellido').value
+    }));
+}
+
+// Función para llenar tablas con los datos
+function llenarTablas(bebidasSeleccionadas, cantidadEntradas, totalEntradasHTML, totalMesasVIPHTML) {
     const tablaDatos = document.getElementById('tabla-datos').getElementsByTagName('tbody')[0];
-    const tablaNombreApellido = document.getElementById('tabla-nombre-apellido').getElementsByTagName('tbody')[0];
+    tablaDatos.innerHTML = ''; // Limpiar tabla antes de llenar
 
-    tablaDatos.innerHTML = '';
-    tablaNombreApellido.innerHTML = ''; 
-
-    const nombreInput = document.getElementById('nombre').value;
-    const apellidoInput = document.getElementById('apellido').value;
-
-    const filaNombre = tablaNombreApellido.insertRow();
-    filaNombre.insertCell().textContent = "Nombre";
-    filaNombre.insertCell().textContent = nombreInput;
-
-    const filaApellido = tablaNombreApellido.insertRow();
-    filaApellido.insertCell().textContent = "Apellido";
-    filaApellido.insertCell().textContent = apellidoInput;
-
+    // Llenar fila de entradas
     const filaEntradas = tablaDatos.insertRow();
     filaEntradas.insertCell().textContent = "Entradas";
     filaEntradas.insertCell().textContent = cantidadEntradas;
     filaEntradas.insertCell().textContent = `$${precioEntrada}`;
     filaEntradas.insertCell().textContent = `$${totalEntradasHTML}`;
 
+    // Llenar filas de bebidas
     for (const bebidaSeleccionada of bebidasSeleccionadas) {
         const bebida = encontrarBebida(bebidaSeleccionada.nombre);
-        const filaBebidas = tablaDatos.insertRow();
-        filaBebidas.insertCell().textContent = bebida.nombre;
-        filaBebidas.insertCell().textContent = bebidaSeleccionada.cantidad;
-        filaBebidas.insertCell().textContent = `$${bebida.precio}`;
-        filaBebidas.insertCell().textContent = `$${bebida.precio * bebidaSeleccionada.cantidad}`;
+        if (bebida) { // Verificar que la bebida existe
+            const filaBebidas = tablaDatos.insertRow();
+            filaBebidas.insertCell().textContent = bebida.nombre;
+            filaBebidas.insertCell().textContent = bebidaSeleccionada.cantidad;
+            filaBebidas.insertCell().textContent = `$${bebida.precio}`;
+            filaBebidas.insertCell().textContent = `$${bebida.precio * bebidaSeleccionada.cantidad}`;
+        } else {
+            console.warn(`Bebida no encontrada: ${bebidaSeleccionada.nombre}`);
+        }
     }
 
+    // Llenar fila de mesas VIP
     const filaVIP = tablaDatos.insertRow();
     const cantidadMesasVIP = parseInt(document.getElementById('cantidad-mesas-vip').value) || 0;
     filaVIP.insertCell().textContent = "Mesas VIP";
@@ -158,37 +162,67 @@ function calcularTotal() {
     filaVIP.insertCell().textContent = `$156000`;
     filaVIP.insertCell().textContent = `$${totalMesasVIPHTML}`;
 
+    // Llenar fila total
     const filaTotal = tablaDatos.insertRow();
     filaTotal.insertCell().textContent = "Total";
     filaTotal.insertCell().textContent = '';
     filaTotal.insertCell().textContent = '';
-    filaTotal.insertCell().textContent = `$${totalFinalHTML}`;
-
-    resultadoEntradas.textContent = `Total Entradas: $${totalEntradasHTML}`;
-    resultadoBebidas.textContent = `Total Bebidas: $${totalBebidasHTML}`;
-    resultadoMesaVIP.textContent = `Total Mesas VIP: $${totalMesasVIPHTML}`;
-    resultadoTotal.textContent = `Total Final: $${totalFinalHTML}`;
-
-    localStorage.setItem('datosBoliche', JSON.stringify({
-        entradas: cantidadEntradas,
-        bebidas: bebidasSeleccionadas,
-        mesasVIP: cantidadMesasVIP,
-        total: totalFinalHTML,
-        nombre: nombreInput,
-        apellido: apellidoInput
-    }));
+    filaTotal.insertCell().textContent = `$${totalEntradasHTML + totalMesasVIPHTML + calcularTotalBebidas(bebidasSeleccionadas)}`;
 }
 
-// Función para recuperar datos del localStorage
-function recuperarDatos() {
-    const datosGuardados = JSON.parse(localStorage.getItem('datosBoliche'));
-    if (datosGuardados) {
-        document.getElementById('cantidad-entradas').value = datosGuardados.entradas;
-        document.getElementById('nombre').value = datosGuardados.nombre;
-        document.getElementById('apellido').value = datosGuardados.apellido;
+// Nueva función para llenar tabla de nombre y apellido
+function llenarTablaNombreApellido() {
+    // Obtener valores de entrada
+    const nombre = document.getElementById("nombre").value;
+    const apellido = document.getElementById("apellido").value;
 
-        document.getElementById('cantidad-mesas-vip').value = datosGuardados.mesasVIP;
+    // Obtener referencias a la tabla de nombre y apellido
+    const tablaNombreApellido = document.getElementById("tabla-nombre-apellido").getElementsByTagName("tbody")[0];
+
+    // Limpiar la tabla antes de añadir nuevos datos
+    tablaNombreApellido.innerHTML = "";
+
+    // Comprobar si los campos no están vacíos
+    if (nombre) {
+        // Crear una nueva fila para el nombre
+        const filaNombre = tablaNombreApellido.insertRow();
+        filaNombre.insertCell(0).textContent = "Nombre";
+        filaNombre.insertCell(1).textContent = nombre;
+    } else {
+        console.error("El nombre no puede estar vacío.");
+    }
+
+    if (apellido) {
+        // Crear una nueva fila para el apellido
+        const filaApellido = tablaNombreApellido.insertRow();
+        filaApellido.insertCell(0).textContent = "Apellido";
+        filaApellido.insertCell(1).textContent = apellido;
+    } else {
+        console.error("El apellido no puede estar vacío.");
     }
 }
 
-window.onload = recuperarDatos;
+// Nueva función para manejar la selección VIP
+function manejarSeleccionVIP() {
+    const vipSection = document.getElementById('vip-section');
+    const mesaVIPSelect = document.getElementById('mesa-vip');
+
+    // Mostrar u ocultar la sección VIP según la selección
+    if (mesaVIPSelect.value === 'si') {
+        vipSection.style.display = 'block'; // Mostrar sección VIP
+    } else {
+        vipSection.style.display = 'none'; // Ocultar sección VIP
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Event listener para el botón de calcular total
+    document.getElementById('calcular').addEventListener('click', calcularTotal);
+    
+    // Asegúrate de que el elemento existe antes de agregar el event listener
+    const cantidadMesasVip = document.getElementById('cantidad-mesas-vip');
+    if (cantidadMesasVip) {
+        cantidadMesasVip.addEventListener('input', manejarSeleccionVIP);
+    }
+});
