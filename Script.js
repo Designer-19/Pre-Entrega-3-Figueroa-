@@ -54,12 +54,12 @@ function calcularTotalBebidas(bebidasSeleccionadas) {
 // Función para seleccionar bebidas
 function seleccionarBebidas() {
     const bebidaSeleccionada = document.getElementById('bebida').value;
-    const cantidadBebidas = document.getElementById('cantidad-bebidas').value;
+    const cantidadBebidas = parseInt(document.getElementById('cantidad-bebidas').value);
 
-    if (bebidaSeleccionada && cantidadBebidas > 0) {
+    if (bebidaSeleccionada && !isNaN(cantidadBebidas) && cantidadBebidas > 0) {
         const bebidaInfo = document.getElementById('resultado-bebidas');
         bebidaInfo.textContent = `Has seleccionado ${cantidadBebidas} ${bebidaSeleccionada}`;
-        return [{ nombre: bebidaSeleccionada, cantidad: parseInt(cantidadBebidas) }];
+        return [{ nombre: bebidaSeleccionada, cantidad: cantidadBebidas }];
     } else {
         document.getElementById('mensaje-error').textContent = "Por favor, selecciona una bebida y la cantidad.";
         return [];
@@ -91,6 +91,7 @@ function calcularMesasVIP() {
     return totalMesasVIP;
 }
 
+// Función para manejar la selección de mesas VIP
 function manejarSeleccionVIP() {
     const mesaVIP = document.getElementById("mesa-vip").value;
     const vipSection = document.getElementById("vip-section");
@@ -102,28 +103,32 @@ function manejarSeleccionVIP() {
     }
 }
 
-
-
 // Función principal para calcular y mostrar el total
 function calcularTotal() {
     const cantidadEntradasInput = document.getElementById('cantidad-entradas');
     const cantidadEntradas = parseInt(cantidadEntradasInput.value) || 0;
+    
+    if (cantidadEntradas <= 0) {
+        document.getElementById('mensaje-error').textContent = "Por favor, selecciona al menos una entrada.";
+        return;
+    }
+
     const totalEntradasHTML = totalEntrada(cantidadEntradas);
 
     const bebidasSeleccionadas = seleccionarBebidas();
     const totalBebidasHTML = calcularTotalBebidas(bebidasSeleccionadas);
     const totalMesasVIPHTML = calcularMesasVIP();
-    const totalFinalHTML = totalEntradasHTML + totalBebidasHTML + totalMesasVIPHTML;
+    const totalFinalHTML = totalEntradasHTML + totalBebidasHTML + (document.getElementById('mesa-vip').value === "si" ? totalMesasVIPHTML : 0);
 
     const resultadoEntradas = document.getElementById('resultado-entradas');
     const resultadoBebidas = document.getElementById('resultado-bebidas');
     const resultadoMesaVIP = document.getElementById('resultado-mesa-vip');
     const resultadoTotal = document.getElementById('resultado-total');
-    const tablaDatos = document.getElementById('tabla-datos').getElementsByTagName('tbody')[0];
-    const tablaNombreApellido = document.getElementById('tabla-nombre-apellido').getElementsByTagName('tbody')[0];
+    const tablaDatos = document.querySelector('#tabla-datos tbody');
+    const tablaNombreApellido = document.querySelector('#tabla-nombre-apellido tbody');
 
     tablaDatos.innerHTML = '';
-    tablaNombreApellido.innerHTML = ''; 
+    tablaNombreApellido.innerHTML = '';
 
     const nombreInput = document.getElementById('nombre').value;
     const apellidoInput = document.getElementById('apellido').value;
@@ -151,12 +156,16 @@ function calcularTotal() {
         filaBebidas.insertCell().textContent = `$${bebida.precio * bebidaSeleccionada.cantidad}`;
     }
 
-    const filaVIP = tablaDatos.insertRow();
-    const cantidadMesasVIP = parseInt(document.getElementById('cantidad-mesas-vip').value) || 0;
-    filaVIP.insertCell().textContent = "Mesas VIP";
-    filaVIP.insertCell().textContent = cantidadMesasVIP > 0 ? cantidadMesasVIP : '0';
-    filaVIP.insertCell().textContent = `$156000`;
-    filaVIP.insertCell().textContent = `$${totalMesasVIPHTML}`;
+    // Verificar si el usuario seleccionó la opción de mesas VIP
+    const mesaVIP = document.getElementById("mesa-vip").value;
+    if (mesaVIP === "si") {
+        const filaVIP = tablaDatos.insertRow();
+        const cantidadMesasVIP = parseInt(document.getElementById('cantidad-mesas-vip').value) || 0;
+        filaVIP.insertCell().textContent = "Mesas VIP";
+        filaVIP.insertCell().textContent = cantidadMesasVIP > 0 ? cantidadMesasVIP : '0';
+        filaVIP.insertCell().textContent = `$156000`;
+        filaVIP.insertCell().textContent = `$${totalMesasVIPHTML}`;
+    }
 
     const filaTotal = tablaDatos.insertRow();
     filaTotal.insertCell().textContent = "Total";
@@ -166,17 +175,22 @@ function calcularTotal() {
 
     resultadoEntradas.textContent = `Total Entradas: $${totalEntradasHTML}`;
     resultadoBebidas.textContent = `Total Bebidas: $${totalBebidasHTML}`;
-    resultadoMesaVIP.textContent = `Total Mesas VIP: $${totalMesasVIPHTML}`;
+    resultadoMesaVIP.textContent = mesaVIP === "si" ? `Total Mesas VIP: $${totalMesasVIPHTML}` : '';
     resultadoTotal.textContent = `Total Final: $${totalFinalHTML}`;
 
-    localStorage.setItem('datosBoliche', JSON.stringify({
-        entradas: cantidadEntradas,
-        bebidas: bebidasSeleccionadas,
-        mesasVIP: cantidadMesasVIP,
-        total: totalFinalHTML,
-        nombre: nombreInput,
-        apellido: apellidoInput
-    }));
+    // Guardar datos en localStorage
+    try {
+        localStorage.setItem('datosBoliche', JSON.stringify({
+            entradas: cantidadEntradas,
+            bebidas: bebidasSeleccionadas,
+            mesasVIP: mesaVIP === "si" ? cantidadMesasVIP : 0,
+            total: totalFinalHTML,
+            nombre: nombreInput,
+            apellido: apellidoInput
+        }));
+    } catch (e) {
+        console.error("Error guardando en localStorage", e);
+    }
 }
 
 // Función para recuperar datos del localStorage
@@ -188,7 +202,15 @@ function recuperarDatos() {
         document.getElementById('apellido').value = datosGuardados.apellido;
 
         document.getElementById('cantidad-mesas-vip').value = datosGuardados.mesasVIP;
+
+        if (datosGuardados.bebidas.length > 0) {
+            document.getElementById('bebida').value = datosGuardados.bebidas[0].nombre;
+            document.getElementById('cantidad-bebidas').value = datosGuardados.bebidas[0].cantidad;
+        }
+
+        calcularTotal(); // Volver a calcular total basado en datos recuperados
     }
 }
 
+// Llamar a recuperarDatos cuando se carga la página
 window.onload = recuperarDatos;
