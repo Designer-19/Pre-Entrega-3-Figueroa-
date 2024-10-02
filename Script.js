@@ -12,25 +12,20 @@ class Bebida {
 }
 
 // Crear bebidas usando el constructor de la clase Bebida
-const cerveza = new Bebida("Cerveza", 7000);
-const agua = new Bebida("Agua", 3500);
-const caipiFrutosRojos = new Bebida("Caipi Frutos Rojos", 10000);
-const caipiMaracuya = new Bebida("Caipi Maracuya", 10000);
-const caipiAbsolut = new Bebida("Caipi Absolut", 10000);
-const caipiSmirnoff = new Bebida("Caipi Smirnoff", 10000);
-const fernetConCoca = new Bebida("Fernet con Coca", 8500);
-const vodkaConSpeed = new Bebida("Vodka con Speed", 6790);
-const botellaDeFernet = new Bebida("Botella de Fernet", 90000);
-const caipiroskaAbsolutConMaracuya = new Bebida("Caipiroska Absolut con Maracuya", 14000);
-const caipiroskaAbsolutConFrutosRojos = new Bebida("Caipiroska Absolut con Frutos Rojos", 14000);
-const caipiroskaAbsolut = new Bebida("Caipiroska Absolut", 14000);
-const caipiroskaSmirnoff = new Bebida("Caipiroska Smirnoff", 14000);
-
-// Array con los objetos de bebidas
 const bebidas = [
-    cerveza, agua, caipiFrutosRojos, caipiMaracuya, caipiAbsolut, caipiSmirnoff, 
-    fernetConCoca, vodkaConSpeed, botellaDeFernet, caipiroskaAbsolutConMaracuya, 
-    caipiroskaAbsolutConFrutosRojos, caipiroskaAbsolut, caipiroskaSmirnoff
+    new Bebida("Cerveza", 7000),
+    new Bebida("Agua", 3500),
+    new Bebida("Caipi Frutos Rojos", 10000),
+    new Bebida("Caipi Maracuya", 10000),
+    new Bebida("Caipi Absolut", 10000),
+    new Bebida("Caipi Smirnoff", 10000),
+    new Bebida("Fernet con Coca", 8500),
+    new Bebida("Vodka con Speed", 6790),
+    new Bebida("Botella de Fernet", 90000),
+    new Bebida("Caipiroska Absolut con Maracuya", 14000),
+    new Bebida("Caipiroska Absolut con Frutos Rojos", 14000),
+    new Bebida("Caipiroska Absolut", 14000),
+    new Bebida("Caipiroska Smirnoff", 14000)
 ];
 
 // Función para validar el número de la bebida seleccionada
@@ -38,36 +33,36 @@ function validarSeleccion(seleccion, max) {
     return !isNaN(seleccion) && seleccion > 0 && seleccion <= max;
 }
 
-// Función para filtrar todas las bebidas que son caipis
-function filtrarCaipis() {
-    const caipis = bebidas.filter(bebida => bebida.nombre.toLowerCase().includes("caipi") && !bebida.nombre.toLowerCase().includes("caipiroska"));
-    console.log("Sabores de Caipi disponibles:");
-    caipis.forEach(caipi => {
-        console.log(`${caipi.nombre}: $${caipi.precio}`);
-    });
+// Función para encontrar una bebida específica usando find()
+function encontrarBebida(nombre) {
+    return bebidas.find(bebida => bebida.nombre.toLowerCase() === nombre.toLowerCase());
 }
 
-// Función para filtrar todas las bebidas que son caipiroskas
-function filtrarCaipiroskas() {
-    const caipiroskas = bebidas.filter(bebida => bebida.nombre.toLowerCase().includes("caipiroska"));
-    console.log("Sabores de Caipiroska disponibles:");
-    caipiroskas.forEach(caipiroska => {
-        console.log(`${caipiroska.nombre}: $${caipiroska.precio}`);
-    });
+// Función para calcular el total de bebidas seleccionadas
+function calcularTotalBebidas(bebidasSeleccionadas) {
+    return bebidasSeleccionadas.reduce((total, bebidaSeleccionada) => {
+        let bebida = encontrarBebida(bebidaSeleccionada.nombre);
+        if (bebida) {
+            return total + (bebida.precio * bebidaSeleccionada.cantidad);
+        } else {
+            console.warn(`Bebida no encontrada: ${bebidaSeleccionada.nombre}`);
+            return total;
+        }
+    }, 0);
 }
 
-// Función que muestra los sabores según la elección del usuario
-function mostrarSabores() {
-    let inputUsuario = prompt("¿Qué querés ver, caipi o caipiroska?").toLowerCase();
-    
-    if (inputUsuario === "caipi") {
-        alert("Mostrando sabores de Caipi. Mira la consola para los detalles.");
-        filtrarCaipis(); // Muestra sabores de caipi en la consola
-    } else if (inputUsuario === "caipiroska") {
-        alert("Mostrando sabores de Caipiroska. Mira la consola para los detalles.");
-        filtrarCaipiroskas(); // Muestra sabores de caipiroska en la consola
+// Función para seleccionar bebidas
+function seleccionarBebidas() {
+    const bebidaSeleccionada = document.getElementById('bebida').value;
+    const cantidadBebidas = document.getElementById('cantidad-bebidas').value;
+
+    if (bebidaSeleccionada && cantidadBebidas > 0) {
+        const bebidaInfo = document.getElementById('resultado-bebidas');
+        bebidaInfo.textContent = `Has seleccionado ${cantidadBebidas} ${bebidaSeleccionada}`;
+        return [{ nombre: bebidaSeleccionada, cantidad: parseInt(cantidadBebidas) }];
     } else {
-        alert("Opción no válida. Por favor ingresa 'caipi' o 'caipiroska'.");
+        document.getElementById('mensaje-error').textContent = "Por favor, selecciona una bebida y la cantidad.";
+        return [];
     }
 }
 
@@ -76,58 +71,124 @@ function totalEntrada(cantidadEntradas) {
     return cantidadEntradas * precioEntrada;
 }
 
-// Función para seleccionar bebidas y calcular el total
-function seleccionarBebida() {
-    let totalBebidas = 0;
-    let continuar = true;
-    let resumenBebidas = "";
+// Función para calcular el costo de las mesas VIP
+function calcularMesasVIP() {
+    const cantidadMesasVIPInput = document.getElementById('cantidad-mesas-vip');
+    let totalMesasVIP = 0;
 
-    while (continuar) {
-        let mensajeBebidas = "Selecciona una bebida:\n";
-        bebidas.forEach((bebida, index) => {
-            mensajeBebidas += `${index + 1}. ${bebida.nombre} - $${bebida.precio}\n`;
-        });
-        
-        let seleccion = parseInt(prompt(mensajeBebidas)) - 1;
-        if (validarSeleccion(seleccion + 1, bebidas.length)) {
-            let cantidad = parseInt(prompt(`¿Cuántas ${bebidas[seleccion].nombre} querés?`)) || 0;
-            totalBebidas += bebidas[seleccion].precio * cantidad;
-            resumenBebidas += `${cantidad}x ${bebidas[seleccion].nombre} - $${bebidas[seleccion].precio * cantidad}\n`;
+    if (cantidadMesasVIPInput) {
+        const cantidadMesasVIP = parseInt(cantidadMesasVIPInput.value) || 0;
+
+        if (cantidadMesasVIP > 0) {
+            totalMesasVIP = cantidadMesasVIP * 156000; // Precio por mesa VIP
         } else {
-            alert("Selección no válida.");
+            document.getElementById('mensaje-error-vip').textContent = "Por favor selecciona una cantidad válida de mesas VIP.";
         }
-
-        continuar = prompt("¿Querés agregar otra bebida? (si/no)").toLowerCase() === "si";
+    } else {
+        console.error("Elemento del DOM para mesa VIP no encontrado.");
     }
 
-    alert(`Resumen de bebidas seleccionadas:\n${resumenBebidas}`);
-    return totalBebidas;
+    return totalMesasVIP;
 }
+
+function manejarSeleccionVIP() {
+    const mesaVIP = document.getElementById("mesa-vip").value;
+    const vipSection = document.getElementById("vip-section");
+
+    if (mesaVIP === "si") {
+        vipSection.style.display = "block"; // Mostrar sección VIP
+    } else {
+        vipSection.style.display = "none"; // Ocultar sección VIP
+    }
+}
+
+
 
 // Función principal para calcular y mostrar el total
 function calcularTotal() {
-    const cantidadEntradas = parseInt(document.getElementById('cantidad-entradas').value) || 0;
+    const cantidadEntradasInput = document.getElementById('cantidad-entradas');
+    const cantidadEntradas = parseInt(cantidadEntradasInput.value) || 0;
     const totalEntradasHTML = totalEntrada(cantidadEntradas);
 
-    // Calcular el total de bebidas
-    const totalBebidasHTML = seleccionarBebida();
-    const totalFinalHTML = totalEntradasHTML + totalBebidasHTML;
+    const bebidasSeleccionadas = seleccionarBebidas();
+    const totalBebidasHTML = calcularTotalBebidas(bebidasSeleccionadas);
+    const totalMesasVIPHTML = calcularMesasVIP();
+    const totalFinalHTML = totalEntradasHTML + totalBebidasHTML + totalMesasVIPHTML;
 
-    // Mostrar el total a pagar en la página
-    document.getElementById('resultado-entradas').textContent = `Total a pagar por las entradas: $${totalEntradasHTML}`;
-    document.getElementById('resultado-bebidas').textContent = `Total a pagar por las bebidas: $${totalBebidasHTML}`;
-    document.getElementById('resultado-total').textContent = `El total a pagar por entradas y bebidas es: $${totalFinalHTML}`;
+    const resultadoEntradas = document.getElementById('resultado-entradas');
+    const resultadoBebidas = document.getElementById('resultado-bebidas');
+    const resultadoMesaVIP = document.getElementById('resultado-mesa-vip');
+    const resultadoTotal = document.getElementById('resultado-total');
+    const tablaDatos = document.getElementById('tabla-datos').getElementsByTagName('tbody')[0];
+    const tablaNombreApellido = document.getElementById('tabla-nombre-apellido').getElementsByTagName('tbody')[0];
 
-    // Mostrar detalles en un alert
-    alert(`Detalles de la selección:\n` +
-          `Cantidad de entradas: ${cantidadEntradas}\n` +
-          `Total a pagar por las entradas: $${totalEntradasHTML}\n` +
-          `Total a pagar por las bebidas: $${totalBebidasHTML}\n` +
-          `El total a pagar por entradas y bebidas es: $${totalFinalHTML}`);
+    tablaDatos.innerHTML = '';
+    tablaNombreApellido.innerHTML = ''; 
+
+    const nombreInput = document.getElementById('nombre').value;
+    const apellidoInput = document.getElementById('apellido').value;
+
+    const filaNombre = tablaNombreApellido.insertRow();
+    filaNombre.insertCell().textContent = "Nombre";
+    filaNombre.insertCell().textContent = nombreInput;
+
+    const filaApellido = tablaNombreApellido.insertRow();
+    filaApellido.insertCell().textContent = "Apellido";
+    filaApellido.insertCell().textContent = apellidoInput;
+
+    const filaEntradas = tablaDatos.insertRow();
+    filaEntradas.insertCell().textContent = "Entradas";
+    filaEntradas.insertCell().textContent = cantidadEntradas;
+    filaEntradas.insertCell().textContent = `$${precioEntrada}`;
+    filaEntradas.insertCell().textContent = `$${totalEntradasHTML}`;
+
+    for (const bebidaSeleccionada of bebidasSeleccionadas) {
+        const bebida = encontrarBebida(bebidaSeleccionada.nombre);
+        const filaBebidas = tablaDatos.insertRow();
+        filaBebidas.insertCell().textContent = bebida.nombre;
+        filaBebidas.insertCell().textContent = bebidaSeleccionada.cantidad;
+        filaBebidas.insertCell().textContent = `$${bebida.precio}`;
+        filaBebidas.insertCell().textContent = `$${bebida.precio * bebidaSeleccionada.cantidad}`;
+    }
+
+    const filaVIP = tablaDatos.insertRow();
+    const cantidadMesasVIP = parseInt(document.getElementById('cantidad-mesas-vip').value) || 0;
+    filaVIP.insertCell().textContent = "Mesas VIP";
+    filaVIP.insertCell().textContent = cantidadMesasVIP > 0 ? cantidadMesasVIP : '0';
+    filaVIP.insertCell().textContent = `$156000`;
+    filaVIP.insertCell().textContent = `$${totalMesasVIPHTML}`;
+
+    const filaTotal = tablaDatos.insertRow();
+    filaTotal.insertCell().textContent = "Total";
+    filaTotal.insertCell().textContent = '';
+    filaTotal.insertCell().textContent = '';
+    filaTotal.insertCell().textContent = `$${totalFinalHTML}`;
+
+    resultadoEntradas.textContent = `Total Entradas: $${totalEntradasHTML}`;
+    resultadoBebidas.textContent = `Total Bebidas: $${totalBebidasHTML}`;
+    resultadoMesaVIP.textContent = `Total Mesas VIP: $${totalMesasVIPHTML}`;
+    resultadoTotal.textContent = `Total Final: $${totalFinalHTML}`;
+
+    localStorage.setItem('datosBoliche', JSON.stringify({
+        entradas: cantidadEntradas,
+        bebidas: bebidasSeleccionadas,
+        mesasVIP: cantidadMesasVIP,
+        total: totalFinalHTML,
+        nombre: nombreInput,
+        apellido: apellidoInput
+    }));
 }
 
-// Añadir evento para el botón de calcular
-document.getElementById('calcular').addEventListener('click', calcularTotal);
+// Función para recuperar datos del localStorage
+function recuperarDatos() {
+    const datosGuardados = JSON.parse(localStorage.getItem('datosBoliche'));
+    if (datosGuardados) {
+        document.getElementById('cantidad-entradas').value = datosGuardados.entradas;
+        document.getElementById('nombre').value = datosGuardados.nombre;
+        document.getElementById('apellido').value = datosGuardados.apellido;
 
-// Llamada a la función para mostrar sabores de caipi o caipiroska
-mostrarSabores();
+        document.getElementById('cantidad-mesas-vip').value = datosGuardados.mesasVIP;
+    }
+}
+
+window.onload = recuperarDatos;
